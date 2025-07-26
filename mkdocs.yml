@@ -1,0 +1,52 @@
+site_name: lcr-meter
+repo_url: https://github.com/d-e-e-p/lcr-meter
+site_url: https://d-e-e-p.github.io/lcr-meter
+site_description: Measure LCR of multiple channels using CN0565
+site_author: Sandeep & Rachael
+edit_uri: edit/main/docs/
+repo_name: d-e-e-p/lcr-meter
+copyright: Maintained by <a href="https://d-e-e-p.com">d-e-e-p</a>.
+
+nav:
+  - Home: index.md
+  - Modules: modules.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["src/lcr_meter"]
+theme:
+  name: material
+  feature:
+    tabs: true
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/d-e-e-p/lcr-meter
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/lcr-meter
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
