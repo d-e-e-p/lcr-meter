@@ -16,7 +16,7 @@ class ExtractLCR:
                 data = [
                     (freq, z)
                     for seq, amp, freq, z in res_f_vs_impedance
-                    if seq == seq_target and amp == amp_target
+                    if seq == seq_target and amp == amp_target and not math.isnan(z)
                 ]
                 # Sort data by frequency to help with initial guess
                 data.sort(key=lambda x: x[0])
