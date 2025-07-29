@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -16,7 +17,7 @@ class ExtractLCR:
                 data = [
                     (freq, z)
                     for seq, amp, freq, z in res_f_vs_impedance
-                    if seq == seq_target and amp == amp_target and not math.isnan(z)
+                    if seq == seq_target and amp == amp_target and not math.isnan(z.real) and not math.isnan(z.imag)
                 ]
                 # Sort data by frequency to help with initial guess
                 data.sort(key=lambda x: x[0])
