@@ -23,6 +23,9 @@ Homepage = "https://d-e-e-p.github.io/lcr-meter/"
 Repository = "https://github.com/d-e-e-p/lcr-meter"
 Documentation = "https://d-e-e-p.github.io/lcr-meter/"
 
+[project.scripts]
+lcr-meter = "lcr_meter.lcr_meter:main"
+
 [dependency-groups]
 dev = [
     "pytest>=7.2.0",

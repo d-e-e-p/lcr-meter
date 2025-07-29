@@ -23,14 +23,14 @@ class CN0565Tester:
 
                     # Set F+/F-/S+/S- to channels 0-3
                     fplus, fminus = seq*2, seq*2 + 1
-                    splus, sminus = fplus, fminus
-
-                    self.dev[fplus][0] = True
-                    self.dev[splus][1] = True
-                    self.dev[sminus][2] = True
-                    self.dev[fminus][3] = True
+                    # splus, sminus = fplus, fminus
 
                     # Read impedance measurement
+                    self.dev.open_all()
+                    self.dev[fminus][0] = True
+                    self.dev[fminus][1] = True
+                    self.dev[fplus][2] = True
+                    self.dev[fplus][3] = True
                     z = self.dev.channel["voltage0"].raw
                     print(f" amp={self.dev.excitation_amplitude} freq={self.dev.excitation_frequency} {seq=} {z.real=:.0f} {z.imag=::.0f}")
                     ret.append([seq, amp, freq, z])
