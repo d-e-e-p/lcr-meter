@@ -3,6 +3,7 @@ import iio
 
 from .CN0565Tester import CN0565Tester
 from .ExtractLCR import ExtractLCR
+from .Calibrate import Calibrate
 
 
 def main():  # pragma: no cover
@@ -33,10 +34,15 @@ def main():  # pragma: no cover
     calculator = ExtractLCR(seq_list, amp_list, freq_list)
     res_lcr = calculator.compute(res_impedance)
 
-    print(f" lcr estimates: ")
+    print(" lcr estimates: ")
     for seq, amp, L, C, R in res_lcr:
         print(f"{seq=} {amp=} {L=} {C=} {R=}")
 
+    print(" comparison: ")
+    calibrate = Calibrate(seq_list, amp_list)
+    res_comp = calibrate.compare(res_lcr)
+    for amp, Rsq, _, _ in res_comp:
+        print(f"{amp=} {Rsq=}")
 
 if __name__ == "__main__":  # pragma: no cover
     main()
