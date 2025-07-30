@@ -35,7 +35,7 @@ def main():  # pragma: no cover
 
     print(f" lcr estimates: ")
     for seq, amp, L, C, R in res_lcr:
-        print(f"{seq=} {amp=} {L=:0f} {C=:0f} {R=:0f}")
+        print(f"{seq=} {amp=} {L=} {C=} {R=}")
 
 
 if __name__ == "__main__":  # pragma: no cover
