@@ -1,0 +1,1678 @@
+AFE:
+  AFECON:
+    address: 0x2000
+    reset: 0x00080000
+    access: R/W
+    description: AFE configuration register
+    bitfields:
+      DACBUFEN:
+        start_bit: 21
+        num_bits: 1
+        description: Enables the dc DAC buffer. This bit enables the buffer for the high impedance output of the dc DAC.
+        value_map:
+          0: "Disables the dc DAC buffer."
+          1: "Enables the dc DAC buffer."
+      DACREFEN:
+        start_bit: 20
+        num_bits: 1
+        description: High speed DAC reference enable.
+        value_map:
+          0: "Reference disable. Clear to 0 to disable the high speed DAC reference."
+          1: "Reference enable. Set to 1 to enable the high speed DAC reference."
+      SINC2EN:
+        start_bit: 16
+        num_bits: 1
+        description: ADC output 50 Hz/60 Hz notch filter enable. This bit enables the 50 Hz/60 Hz supply rejection filter.
+        value_map:
+          0: "Supply rejection filter disabled. Disables sinc2 (50 Hz/60 Hz digital filter). Disable this bit for impedance measurements."
+          1: "Supply rejection filter enabled. Enables sinc2 (50 Hz/60 Hz digital filter)."
+      DFTEN:
+        start_bit: 15
+        num_bits: 1
+        description: DFT hardware accelerator enable. This bit enables the DFT hardware acceleration block.
+        value_map:
+          0: "DFT hardware accelerator disabled."
+          1: "DFT hardware accelerator enabled."
+      WAVEGENEN:
+        start_bit: 14
+        num_bits: 1
+        description: Waveform generator enable. This bit enables the waveform generator.
+        value_map:
+          0: "Waveform generator disabled. The waveform generator includes a sinusoid wave and a trapezoid wave."
+          1: "Waveform generator enabled."
+      TEMPCONVEN:
+        start_bit: 13
+        num_bits: 1
+        description: ADC temperature sensor convert enable. This bit enables the temperature reading. If this bit is set to 1, a temperature reading is initiated. When the temperature conversion is complete, the result available in the TEMPSENSDAT register.
+        value_map:
+          0: "Temperature reading disabled."
+          1: "Temperature reading enabled."
+      TEMPSENSEN:
+        start_bit: 12
+        num_bits: 1
+        description: ADC temperature sensor channel enable. This bit enables the temperature sensor.
+        value_map:
+          0: "Temperature sensor disabled. The temperature sensor is powered down."
+          1: "Temperature sensor enabled. The temperature sensor is powered up. Temperature readings are not performed unless TEMPCONVEN = 1."
+      TIAEN:
+        start_bit: 11
+        num_bits: 1
+        description: High speed TIA enable. This bit enables the high speed TIA.
+        value_map:
+          0: "High speed TIA disabled."
+          1: "High speed TIA enabled."
+      INAMPEN:
+        start_bit: 10
+        num_bits: 1
+        description: Excitation instrumentation amplifier enable. This bit enables the instrumentation amplifier.
+        value_map:
+          0: "Programmable instrumentation amplifier disabled."
+          1: "Programmable instrumentation amplifier enabled."
+      EXBUFEN:
+        start_bit: 9
+        num_bits: 1
+        description: Excitation buffer enable. This bit enables the excitation buffer to drive the resistance being measured.
+        value_map:
+          0: "Excitation buffer disabled."
+          1: "Excitation buffer enabled."
+      ADCCONVEN:
+        start_bit: 8
+        num_bits: 1
+        description: ADC conversion start enable.
+        value_map:
+          0: "ADC idle. The ADC is powered on, but is not converting."
+          1: "ADC conversions enabled."
+      ADCEN:
+        start_bit: 7
+        num_bits: 1
+        description: ADC power enable. This bit enables the ADC.
+        value_map:
+          0: "ADC disabled. The ADC is powered off."
+          1: "ADC enabled. The ADC is powered on. The ADCCONVEN bit must be set to 1 to start conversions."
+      DACEN:
+        start_bit: 6
+        num_bits: 1
+        description: High speed DAC enable. This bit enables the high speed DAC, the corresponding reconstruction filter, and the attenuator. This bit only enables the analog block and does not include the DAC waveform generator.
+        value_map:
+          0: "High speed DAC disabled."
+          1: "High speed DAC enabled."
+      HSREFDIS:
+        start_bit: 5
+        num_bits: 1
+        description: High speed reference disable. This bit is the power-down signal of the high power reference. Set this bit to 1 to power down the reference.
+        value_map:
+          0: "High power reference enabled."
+          1: "High power reference disabled."
+  PMBW:
+    address: 0x22F0
+    reset: 0x00088800
+    access: R/W
+    description: Power modes configuration register
+    bitfields:
+      SYSBW:
+        start_bit: 2
+        num_bits: 2
+        description: "System bandwidth configure. The reconstruction filter of the high speed DAC and the antialias filter bandwidth configuration of the ADC are configured by a single register."
+        value_map:
+          0: "No action for system configuration. The reconstruction filter and antialias filter are automatically configured according to the waveform generator frequency."
+          1: "Waveform generator frequency = 50 kHz, reconstruction filter and antialias filter cutoff = 5 kHz. Waveform generator frequency = 50 kHz to 100 kHz, reconstruction filter and antialias filter cutoff = 100 kHz."
+          2: "Waveform generator frequency = 100 kHz to 200 kHz, reconstruction filter and antialias filter cutoff = 250 kHz."
+          3: "Sets cutoff frequency to 50 kHz, −3 dB bandwidth. Sets cutoff frequency to 100 kHz, −3 dB bandwidth."
+      SYSHS:
+        start_bit: 0
+        num_bits: 1
+        description: "Sets the high speed DAC and ADC in high power mode."
+        value_map:
+          0: "Low power mode. Clear this bit for impedance measurements of <80 kHz."
+          1: "High speed mode. Set this bit for impedance measurements of >80 kHz."
+IDENTIFICATION:
+  ADIID:
+    address: 0x0400
+    reset: 0x4144
+    access: R
+    description: "Analog Devices Inc., identification register"
+    bitfields:
+      ADIID:
+        start_bit: 0
+        num_bits: 16
+        description: "Analog Devices identifier. Always equal to 0x4144."
+  CHIPID:
+    address: 0x0404
+    reset: 0x5502
+    access: R
+    description: "Chip identification register"
+    bitfields:
+      Part_ID:
+        start_bit: 4
+        num_bits: 12
+        description: "Device identifier"
+      Revision:
+        start_bit: 0
+        num_bits: 4
+        description: "Silicon revision number"
+LOW_POWER_DAC:
+  LPDACCON0:
+    address: 0x2128
+    reset: 0x00000002
+    access: R/W
+    description: "Low power DAC configuration register"
+    bitfields:
+      WAVETYPE:
+        start_bit: 6
+        num_bits: 1
+        description: "Low power DAC data source. This bit determines the DAC waveform type."
+        value_map:
+          0: "Direct from LPDACDAT0."
+          1: "Waveform generator."
+      DACMDE:
+        start_bit: 5
+        num_bits: 1
+        description: "Low power DAC switch settings. This bit is the control bit for the low power DAC output switches."
+        value_map:
+          0: "Low power DAC switches set for normal mode (default)."
+          1: "Low power DAC switches set for diagnostic mode."
+      VZEROMUX:
+        start_bit: 4
+        num_bits: 1
+        description: "VZERO0 voltage mux select. This bit selects the DAC output that connects to the VZERO0 node."
+        value_map:
+          0: "VZERO0, 6-bit (default)."
+          1: "VZERO0, voltage 12-bit."
+      VBIASMUX:
+        start_bit: 3
+        num_bits: 1
+        description: "VBIAS0 voltage mux select. This bit selects the low power DAC output that connects to the VBIAS0 node."
+        value_map:
+          0: "Output, 12-bit (default)."
+          1: "Output, 6-bit."
+      REFSEL:
+        start_bit: 2
+        num_bits: 1
+        description: "Low power DAC reference select."
+        value_map:
+          0: "Selects the low power 2.5 V reference as the low power DAC reference source."
+          1: "Selects AVDD as the low power DAC reference source."
+      PWDEN:
+        start_bit: 1
+        num_bits: 1
+        description: "Low power DAC power-down. This bit powers down the control bit for the low power DAC."
+        value_map:
+          0: "Low Power DAC powered on."
+          1: "Low Power DAC powered off (default)."
+      RSTEN:
+        start_bit: 0
+        num_bits: 1
+        description: "Enable writes to low power DAC. Enables writes to LPDACDAT0 register."
+        value_map:
+          0: "Disables low power DAC writes (default)."
+          1: "Enables low power DAC writes."
+  LPDACSW0:
+    address: 0x2124
+    reset: 0x00000000
+    access: R/W
+    description: "Low power DAC switch control register"
+    bitfields:
+      LPMODEDIS:
+        start_bit: 5
+        num_bits: 1
+        description: "Switch control. This bit controls the switches connected to the output of the low power DAC."
+        value_map:
+          0: "Low power DAC switch controlled by LPDACCON0, Bit 5 (default)."
+          1: "Low power DAC switches override."
+      SW4:
+        start_bit: 4
+        num_bits: 1
+        description: "Low power DAC SW4 switch control."
+      SW3:
+        start_bit: 3
+        num_bits: 1
+        description: "Low power DAC SW3 switch control."
+      SW2:
+        start_bit: 2
+        num_bits: 1
+        description: "Low power DAC SW2 switch control."
+      SW1:
+        start_bit: 1
+        num_bits: 1
+        description: "Low power DAC SW1 switch control."
+      SW0:
+        start_bit: 0
+        num_bits: 1
+        description: "Low power DAC SW0 switch control."
+  LPDACDAT0:
+    address: 0x2120
+    reset: 0x00000000
+    access: R/W
+    description: "Low power DAC data output register"
+    bitfields:
+      DACIN6:
+        start_bit: 12
+        num_bits: 6
+        description: "Low power DAC 6-bit output data register (1 LSB = 34.375 mV)."
+      DACIN12:
+        start_bit: 0
+        num_bits: 12
+        description: "Low power DAC 12-bit output data register (1 LSB = 537 µV)."
+  LPREFBUFCON:
+    address: 0x2050
+    reset: 0x00000000
+    access: R/W
+    description: "Low power reference configuration register"
+    bitfields:
+      LPBUF2P5DIS:
+        start_bit: 1
+        num_bits: 1
+        description: "Low power output band gap buffer."
+        value_map:
+          0: "Enables the low power 2.5 V buffer."
+          1: "Powers down the low power 2.5 V buffer."
+      LPREFDIS:
+        start_bit: 0
+        num_bits: 1
+        description: "Low power band gap power-down bit."
+        value_map:
+          0: "Low power reference enabled."
+          1: "Low power reference powered down."
+  SWMUX:
+    address: 0x235C
+    reset: 0x00000000
+    access: R/W
+    description: "Common-mode switch mux select register"
+    bitfields:
+      CMMUX:
+        start_bit: 3
+        num_bits: 1
+        description: "Common-mode resistor select for AIN2 pin and AIN3 pin."
+        value_map:
+          0: "Common-mode switch off."
+LOW_POWER_TIA:
+  LPTIASW0:
+    address: 0x20E4
+    reset: 0x00000000
+    access: R/W
+    description: "Low power TIA switch configuration"
+    bitfields:
+      RECAL:
+        start_bit: 15
+        num_bits: 1
+        description: "SW15 switch control, active high."
+      SW13:
+        start_bit: 13
+        num_bits: 1
+        description: "SW13 switch control, active high."
+      SW12:
+        start_bit: 12
+        num_bits: 1
+        description: "SW12 switch control, active high."
+      SW11:
+        start_bit: 11
+        num_bits: 1
+        description: "SW11 switch control, active high."
+      SW10:
+        start_bit: 10
+        num_bits: 1
+        description: "SW10 switch control, active high."
+      SW9:
+        start_bit: 9
+        num_bits: 1
+        description: "SW9 switch control, active high."
+      SW8:
+        start_bit: 8
+        num_bits: 1
+        description: "SW8 switch control, active high."
+      SW7:
+        start_bit: 7
+        num_bits: 1
+        description: "SW7 switch control, active high."
+      SW6:
+        start_bit: 6
+        num_bits: 1
+        description: "SW6 switch control, active high."
+      SW5:
+        start_bit: 5
+        num_bits: 1
+        description: "SW5 switch control, active high."
+      SW4:
+        start_bit: 4
+        num_bits: 1
+        description: "SW4 switch control, active high."
+      SW3:
+        start_bit: 3
+        num_bits: 1
+        description: "SW3 switch control, active high."
+      SW2:
+        start_bit: 2
+        num_bits: 1
+        description: "SW2 switch control, active high."
+      SW1:
+        start_bit: 1
+        num_bits: 1
+        description: "SW1 switch control, active high."
+      SW0:
+        start_bit: 0
+        num_bits: 1
+        description: "SW0 switch control, active high."
+  LPTIACON0:
+    address: 0x20EC
+    reset: 0x00000003
+    access: R/W
+    description: "Low power TIA control bits, Channel 0"
+    bitfields:
+      TIARF:
+        start_bit: 13
+        num_bits: 3
+        description: "These bits set the low-pass filter resistor (RLPF) and configure the low power TIA output low-pass filter cutoff frequency."
+      TIARL:
+        start_bit: 10
+        num_bits: 3
+        description: "These bits set RLOAD."
+      TIAGAIN:
+        start_bit: 5
+        num_bits: 5
+        description: "These bits set the RTIA."
+      IBOOST:
+        start_bit: 3
+        num_bits: 2
+        description: "Current boost control."
+      HALFPWR:
+        start_bit: 2
+        num_bits: 1
+        description: "Half power mode select. This control bit reduces the active power consumption of the TIA and potentiostat amplifier for Sensor Channel 0."
+      PAPDEN:
+        start_bit: 1
+        num_bits: 1
+        description: "Potentiostat amplifier power-down. Low power potentiostat power-down control bit."
+      TIAPDEN:
+        start_bit: 0
+        num_bits: 1
+        description: "TIA power-down. Low power TIA power-down control bit."
+HIGH_SPEED_DAC:
+  HSDACCON:
+    address: 0x2010
+    reset: 0x0000001E
+    access: R/W
+    description: "High speed DAC configuration"
+    bitfields:
+      INAMPGNMDE:
+        start_bit: 12
+        num_bits: 1
+        description: "Excitation amplifier gain control. This bit selects the gain of the excitation amplifier."
+        value_map:
+          0: "Gain = 2."
+          1: "Gain = 0.25."
+      Rate:
+        start_bit: 1
+        num_bits: 8
+        description: "DAC update rate. DAC update rate = ACLK/HSDACCON, Bits[8:1]."
+      ATTENEN:
+        start_bit: 0
+        num_bits: 1
+        description: "PGA stage gain attenuation. Enable the PGA attenuator at the output of the DAC."
+        value_map:
+          0: "DAC attenuator disabled. Gain of 1 mode."
+          1: "DAC attenuator enabled. Gain of 0.2 mode."
+  HSDACDAT:
+    address: 0x2048
+    reset: 0x00000800
+    access: R/W
+    description: "High speed DAC code register"
+    bitfields:
+      DACDAT:
+        start_bit: 0
+        num_bits: 12
+        description: "DAC code, written directly to the DAC. The minimum code is 0x200 and the maximum code is 0xE00. Midscale (0x800) corresponds to an output voltage of 0 V."
+HIGH_SPEED_TIA:
+  HSRTIACON:
+    address: 0x20F0
+    reset: 0x0000000F
+    access: R/W
+    description: "High speed RTIA configuration"
+    bitfields:
+      CTIACON:
+        start_bit: 5
+        num_bits: 8
+        description: "Configure capacitor in parallel with RTIA. This capacitor stabilizes the amplifier loop."
+      TIASW6CON:
+        start_bit: 4
+        num_bits: 1
+        description: "SW6 switch control. Use the SW6 switch to select whether or not to use the diode in parallel with RTIA."
+      RTIACON:
+        start_bit: 0
+        num_bits: 4
+        description: "Configure general RTIA value."
+  DE0RESCON:
+    address: 0x20F8
+    reset: 0x000000FF
+    access: R/W
+    description: "DE0 high speed TIA resistors configuration"
+    bitfields:
+      DE0RCON:
+        start_bit: 0
+        num_bits: 8
+        description: "RLOAD_DE0 and RTIA_DE0 setting."
+  HSTIACON:
+    address: 0x20FC
+    reset: 0x00000000
+    access: R/W
+    description: "High speed TIA configuration"
+    bitfields:
+      VBIASSEL:
+        start_bit: 0
+        num_bits: 2
+        description: "Select high speed TIA positive input."
+ADC_CIRCUIT:
+  ADCFILTERCON:
+    address: 0x2044
+    reset: 0x00000301
+    access: R/W
+    description: "ADC output filters configuration register"
+    bitfields:
+      DFTCLKENB:
+        start_bit: 18
+        num_bits: 1
+        description: "DFT clock enable."
+      DACWAVECLKENB:
+        start_bit: 17
+        num_bits: 1
+        description: "DAC wave clock enable."
+      SINC2CLKENB:
+        start_bit: 16
+        num_bits: 1
+        description: "Sinc2 filter clock enable."
+      AVRGNUM:
+        start_bit: 14
+        num_bits: 2
+        description: "These bits set the number of samples used by the averaging function."
+      SINC3OSR:
+        start_bit: 12
+        num_bits: 2
+        description: "Sinc3 filter oversampling rate."
+      SINC2OSR:
+        start_bit: 8
+        num_bits: 4
+        description: "Sinc2 oversampling rate (OSR)."
+      AVRGEN:
+        start_bit: 7
+        num_bits: 1
+        description: "ADC average function enable."
+      SINC3BYP:
+        start_bit: 6
+        num_bits: 1
+        description: "Sinc3 filter bypass. This bit bypasses the sinc3 filter."
+      LPFBYPEN:
+        start_bit: 4
+        num_bits: 1
+        description: "50 Hz/60 Hz notch filter."
+      ADCSAMPLERATE:
+        start_bit: 0
+        num_bits: 1
+        description: "ADC data rate. Unfiltered ADC output rate."
+  ADCDAT:
+    address: 0x2074
+    reset: 0x00000000
+    access: R/W
+    description: "ADC raw result register"
+    bitfields:
+      Data:
+        start_bit: 0
+        num_bits: 16
+        description: "ADC result. This register contains the ADC conversion result."
+  DFTREAL:
+    address: 0x2078
+    reset: 0x00000000
+    access: R/W
+    description: "DFT result, real device register"
+    bitfields:
+      Data:
+        start_bit: 0
+        num_bits: 18
+        description: "DFT, real. The DFT hardware accelerator returns a complex number in Cartesian format (real and imaginary)."
+  DFTIMAG:
+    address: 0x207C
+    reset: 0x00000000
+    access: R/W
+    description: "DFT result, imaginary device register"
+    bitfields:
+      Data:
+        start_bit: 0
+        num_bits: 18
+        description: "DFT, imaginary. The DFT hardware accelerator returns a complex number in Cartesian format (real and imaginary)."
+  SINC2DAT:
+    address: 0x2080
+    reset: 0x00000000
+    access: R/W
+    description: "Sinc2 filter result register"
+    bitfields:
+      Data:
+        start_bit: 0
+        num_bits: 16
+        description: "Low-pass filter result. Sinc2 filter, ADC output result."
+  TEMPSENSDAT:
+    address: 0x2084
+    reset: 0x00000000
+    access: R/W
+    description: "Temperature sensor result register"
+    bitfields:
+      Data:
+        start_bit: 0
+        num_bits: 16
+        description: "ADC temperature sensor channel result."
+  DFTCON:
+    address: 0x20D0
+    reset: 0x00000090
+    access: R/W
+    description: "DFT configuration register"
+    bitfields:
+      DFTINSEL:
+        start_bit: 20
+        num_bits: 2
+        description: "DFT input select."
+      DFTNUM:
+        start_bit: 4
+        num_bits: 4
+        description: "ADC samples used. DFT number ranges from 4 up to 16,384."
+      HANNINGEN:
+        start_bit: 0
+        num_bits: 1
+        description: "Hanning window enable."
+  TEMPSENS:
+    address: 0x2174
+    reset: 0x00000000
+    access: R/W
+    description: "Temperature sensor configuration register"
+    bitfields:
+      CHOPFRESEL:
+        start_bit: 2
+        num_bits: 2
+        description: "Chop mode frequency setting."
+      CHOPCON:
+        start_bit: 1
+        num_bits: 1
+        description: "Temperature sensor chop mode."
+      Enable:
+        start_bit: 0
+        num_bits: 1
+        description: "Unused. Temperature sensor enable. AFECON, Bit 12 overrides this bit."
+  ADCCON:
+    address: 0x21A8
+    reset: 0x00000000
+    access: R/W
+    description: "ADC configuration register"
+    bitfields:
+      GNPGA:
+        start_bit: 16
+        num_bits: 3
+        description: "PGA gain setup."
+      GNOFSELPGA:
+        start_bit: 15
+        num_bits: 1
+        description: "Internal offset/gain cancellation."
+      MUXSELN:
+        start_bit: 8
+        num_bits: 5
+        description: "Select signals for the ADC input multiplexer as negative input."
+      MUXSELP:
+        start_bit: 0
+        num_bits: 6
+        description: "Select signals for the ADC input multiplexer as positive input."
+  REPEATADCCNV:
+    address: 0x21F0
+    reset: 0x00000160
+    access: R/W
+    description: "Repeat ADC conversion control register"
+    bitfields:
+      NUM:
+        start_bit: 4
+        num_bits: 8
+        description: "Repeat value. Writing 0 to these bits causes unpredictable operation."
+      EN_P_enable:
+        start_bit: 0
+        num_bits: 1
+        description: "Enable repeat ADC conversions."
+  ADCBUFCON:
+    address: 0x238C
+    reset: 0x005F3D00
+    access: R/W
+    description: "ADC buffer configuration register"
+    bitfields:
+      AMPDIS:
+        start_bit: 4
+        num_bits: 5
+        description: "Set these bits to 1 to disable the op amp. Set these bits to 0 to enable the op amp."
+      CHOPDIS:
+        start_bit: 0
+        num_bits: 4
+        description: "Set these bits to 1 to disable chop. Set these bits to 0 to enable chop."
+ADC_CALIBRATION:
+  CALDATLOCK:
+    address: 0x2230
+    reset: 0xDE87A5A0
+    access: R/W
+    description: "Calibration data lock register"
+    bitfields:
+      Key:
+        start_bit: 0
+        num_bits: 32
+        description: "Password for the calibration data registers."
+  ADCOFFSETLPTIA:
+    address: 0x2288
+    reset: 0x00000000
+    access: R/W
+    description: "ADC offset calibration on the low power TIA channel register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Offset calibration for the low power TIA."
+  ADCGNLPTIA:
+    address: 0x228C
+    reset: 0x00004000
+    access: R/W
+    description: "ADC gain calibration for the low power TIA channel register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Gain error calibration for the low power TIA."
+  ADCOFFSETHSTIA:
+    address: 0x2234
+    reset: 0x00000000
+    access: R/W
+    description: "ADC offset calibration on the high speed TIA channel register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "High speed TIA offset calibration."
+  ADCGAINHSTIA:
+    address: 0x2284
+    reset: 0x00004000
+    access: R/W
+    description: "ADC gain calibration for the high speed TIA channel register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Gain error calibration on the high speed TIA channel."
+  ADCOFFSETGN1:
+    address: 0x2244
+    reset: 0x00000000
+    access: R/W
+    description: "ADC offset calibration auxiliary channel (PGA gain = 1) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Offset calibration gain = 1."
+  ADCGAINGN1:
+    address: 0x2240
+    reset: 0x00004000
+    access: R/W
+    description: "ADC gain calibration auxiliary input channel (PGA gain = 1) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Gain calibration for PGA gain = 1."
+  ADCOFFSETGN1P5:
+    address: 0x22CC
+    reset: 0x00000000
+    access: R/W
+    description: "ADC offset calibration auxiliary input channel (PGA gain = 1.5) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Offset calibration gain = 1.5."
+  ADCGAINGN1P5:
+    address: 0x2270
+    reset: 0x00004000
+    access: R/W
+    description: "ADC gain calibration auxiliary input channel (PGA gain = 1.5) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Gain calibration for PGA gain = 1.5."
+  ADCOFFSETGN2:
+    address: 0x22C8
+    reset: 0x00000000
+    access: R/W
+    description: "ADC offset calibration auxiliary input channel (PGA gain = 2) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Offset calibration auxiliary channel (PGA gain = 2)."
+  ADCGAINGN2:
+    address: 0x2274
+    reset: 0x00004000
+    access: R/W
+    description: "ADC gain calibration auxiliary input channel (PGA gain = 2) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Gain calibration for PGA gain = 2."
+  ADCOFFSETGN4:
+    address: 0x22D4
+    reset: 0x00000000
+    access: R/W
+    description: "ADC offset calibration auxiliary input channel (PGA gain = 4) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Offset calibration gain = 4."
+  ADCGAINGN4:
+    address: 0x2278
+    reset: 0x00004000
+    access: R/W
+    description: "ADC gain calibration auxiliary input channel (PGA gain = 4) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Gain calibration for PGA gain = 4."
+  ADCOFFSETGN9:
+    address: 0x22D0
+    reset: 0x00000000
+    access: R/W
+    description: "ADC offset calibration auxiliary input channel (PGA gain = 9) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Offset calibration gain = 9."
+  ADCGAINGN9:
+    address: 0x2298
+    reset: 0x00004000
+    access: R/W
+    description: "ADC gain calibration auxiliary input channel (PGA gain = 9) register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Gain calibration for PGA gain = 9."
+  ADCOFFSETTEMPSENS:
+    address: 0x223C
+    reset: 0x00000000
+    access: R/W
+    description: "ADC offset calibration temperature sensor channel register"
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 15
+        description: "Offset calibration for the temperature sensor."
+  ADCGAINTEMPSENS:
+    address: 0x2238
+    reset: 0x00004000
+    access: R/W
+    description: "ADC gain calibration temperature sensor channel register"
+    bitfields:
+      GAINTEMPSENS:
+        start_bit: 0
+        num_bits: 15
+        description: "Gain calibration for the temperature sensor channel."
+ADC_POST_PROCESSING:
+  ADCMIN:
+    address: 0x20A8
+    reset: 0x00000000
+    access: R/W
+    description: "ADC minimum value check register"
+    bitfields:
+      MINVAL:
+        start_bit: 0
+        num_bits: 16
+        description: "ADC minimum value threshold."
+  ADCMINSM:
+    address: 0x20AC
+    reset: 0x00000000
+    access: R/W
+    description: "ADC minimum hysteresis value register"
+    bitfields:
+      MINCLRVAL:
+        start_bit: 0
+        num_bits: 16
+        description: "ADCMIN hysteresis value."
+  ADCMAX:
+    address: 0x20B0
+    reset: 0x00000000
+    access: R/W
+    description: "ADC maximum value check register"
+    bitfields:
+      MAXVAL:
+        start_bit: 0
+        num_bits: 16
+        description: "ADC maximum threshold."
+  ADCMAXSMEN:
+    address: 0x20B4
+    reset: 0x00000000
+    access: R/W
+    description: "ADC maximum hysteresis value register"
+    bitfields:
+      MAXSWEN:
+        start_bit: 0
+        num_bits: 16
+        description: "ADCMAX hysteresis value."
+  ADCDELTA:
+    address: 0x20B8
+    reset: 0x00000000
+    access: R/W
+    description: "ADC delta value check register"
+    bitfields:
+      DELTAVAL:
+        start_bit: 0
+        num_bits: 16
+        description: "ADCDAT code differences limit option."
+ADC_STATISTICS:
+  STATSVAR:
+    address: 0x21C0
+    reset: 0x00000000
+    access: R
+    description: "Variance output register"
+    bitfields:
+      Variance:
+        start_bit: 0
+        num_bits: 31
+        description: "Statistical variance value."
+  STATSCON:
+    address: 0x21C4
+    reset: 0x00000000
+    access: R/W
+    description: "Statistics control module configuration register"
+    bitfields:
+      STDDEV:
+        start_bit: 7
+        num_bits: 5
+        description: "Standard deviation configuration."
+      SAMPLENUM:
+        start_bit: 4
+        num_bits: 3
+        description: "Sample size. These bits set the number of ADC samples used for each statistic calculation."
+      STATSEN:
+        start_bit: 0
+        num_bits: 1
+        description: "Statistics enable."
+  STATSMEAN:
+    address: 0x21C8
+    reset: 0x00000000
+    access: R
+    description: "Mean output register"
+    bitfields:
+      Mean:
+        start_bit: 0
+        num_bits: 16
+        description: "Mean output. These bits form the mean value calculated for the number of ADC samples set by STATSCON, Bits[6:4]."
+PROGRAMMABLE_SWITCHES:
+  SWCON:
+    address: 0x200C
+    reset: 0x0000FFFF
+    access: R/W
+    description: "Switch matrix configuration"
+    bitfields:
+      T10CON:
+        start_bit: 18
+        num_bits: 1
+        description: "Control of the T10 switch."
+      T9CON:
+        start_bit: 17
+        num_bits: 1
+        description: "Control of the T9 switch."
+      SWSOURCESEL:
+        start_bit: 16
+        num_bits: 1
+        description: "Switch control select. This bit selects the registers to control the programmable switches."
+      TMUXCON:
+        start_bit: 12
+        num_bits: 4
+        description: "Control of the Tx/TR1 switch mux."
+      NMUXCON:
+        start_bit: 8
+        num_bits: 4
+        description: "Control of N switch mux."
+      PMUXCON:
+        start_bit: 4
+        num_bits: 4
+        description: "Control of Px/Pxx switch mux."
+      DMUXCON:
+        start_bit: 0
+        num_bits: 4
+        description: "Control of Dx/DR0 switch mux."
+  DSWFULLCON:
+    address: 0x2150
+    reset: 0x00000000
+    access: R/W
+    description: "Switch matrix full configuration (Dx/DR0)"
+    bitfields:
+      D8:
+        start_bit: 7
+        num_bits: 1
+        description: "Control of the D8 switch."
+      D7:
+        start_bit: 6
+        num_bits: 1
+        description: "Control of the D7 switch."
+      D5:
+        start_bit: 4
+        num_bits: 1
+        description: "Control of the D5 switch."
+      D4:
+        start_bit: 3
+        num_bits: 1
+        description: "Control of the D4 switch."
+      D3:
+        start_bit: 2
+        num_bits: 1
+        description: "Control of the D3 switch."
+      D2:
+        start_bit: 1
+        num_bits: 1
+        description: "Control of the D2 switch."
+      DR0:
+        start_bit: 0
+        num_bits: 1
+        description: "Control of the DR0 switch."
+  NSWFULLCON:
+    address: 0x2154
+    reset: 0x00000000
+    access: R/W
+    description: "Switch matrix full configuration (Nx/Nxx)"
+    bitfields:
+      NL2:
+        start_bit: 11
+        num_bits: 1
+        description: "Control of the NL2 switch."
+      NL:
+        start_bit: 10
+        num_bits: 1
+        description: "Control of the NL switch."
+      NR1:
+        start_bit: 9
+        num_bits: 1
+        description: "Control of the NR1 switch."
+      N9:
+        start_bit: 8
+        num_bits: 1
+        description: "Control of the N9 switch."
+      N7:
+        start_bit: 6
+        num_bits: 1
+        description: "Control of the N7 switch."
+      N6:
+        start_bit: 5
+        num_bits: 1
+        description: "Control of the N6 switch."
+      N5:
+        start_bit: 4
+        num_bits: 1
+        description: "Control of the N5 switch."
+      N4:
+        start_bit: 3
+        num_bits: 1
+        description: "Control of the N4 switch."
+      N3:
+        start_bit: 2
+        num_bits: 1
+        description: "Control of the N3 switch."
+      N2:
+        start_bit: 1
+        num_bits: 1
+        description: "Control of the N2 switch."
+      N1:
+        start_bit: 0
+        num_bits: 1
+        description: "Control of the N1 switch."
+  PSWFULLCON:
+    address: 0x2158
+    reset: 0x00000000
+    access: R/W
+    description: "Switch matrix full configuration (Px/Pxx)"
+    bitfields:
+      PL2:
+        start_bit: 14
+        num_bits: 1
+        description: "PL2 switch control."
+      PL:
+        start_bit: 13
+        num_bits: 1
+        description: "PL switch control."
+      P11:
+        start_bit: 10
+        num_bits: 1
+        description: "Control of the P11 switch."
+      P9:
+        start_bit: 8
+        num_bits: 1
+        description: "Control of the P9 switch."
+      P8:
+        start_bit: 7
+        num_bits: 1
+        description: "Control of the P8 switch."
+      P7:
+        start_bit: 6
+        num_bits: 1
+        description: "Control of the P7 switch."
+      P6:
+        start_bit: 5
+        num_bits: 1
+        description: "Control of the P6 switch."
+      P5:
+        start_bit: 4
+        num_bits: 1
+        description: "Control of the P5 switch."
+      P4:
+        start_bit: 3
+        num_bits: 1
+        description: "Control of the P4 switch."
+      P3:
+        start_bit: 2
+        num_bits: 1
+        description: "Control of the P3 switch."
+      P2:
+        start_bit: 1
+        num_bits: 1
+        description: "Control of the P2 switch."
+      PR0:
+        start_bit: 0
+        num_bits: 1
+        description: "PR0 switch control."
+  TSWFULLCON:
+    address: 0x215C
+    reset: 0x00000000
+    access: R/W
+    description: "Switch matrix full configuration (Tx/TR1)"
+    bitfields:
+      TR1:
+        start_bit: 11
+        num_bits: 1
+        description: "Control of the TR1 switch."
+      T10:
+        start_bit: 9
+        num_bits: 1
+        description: "Control of the T10 switch."
+      T9:
+        start_bit: 8
+        num_bits: 1
+        description: "Control of the T9 switch."
+      T7:
+        start_bit: 6
+        num_bits: 1
+        description: "Control of the T7 switch."
+      T6:
+        start_bit: 5
+        num_bits: 1
+        description: "Control of the T6 switch."
+      T5:
+        start_bit: 4
+        num_bits: 1
+        description: "Control of the T5 switch."
+      T4:
+        start_bit: 3
+        num_bits: 1
+        description: "Control of the T4 switch."
+      T3:
+        start_bit: 2
+        num_bits: 1
+        description: "Control of the T3 switch."
+      T2:
+        start_bit: 1
+        num_bits: 1
+        description: "Control of the T2 switch."
+      T1:
+        start_bit: 0
+        num_bits: 1
+        description: "Control of the T1 switch."
+  DSWSTA:
+    address: 0x21B0
+    reset: 0x00000000
+    access: R
+    description: "Switch matrix status (Dx/DR0)"
+    bitfields:
+      D8STA:
+        start_bit: 7
+        num_bits: 1
+        description: "Status of the D8 switch."
+      D7STA:
+        start_bit: 6
+        num_bits: 1
+        description: "Status of the D7 switch."
+      D6STA:
+        start_bit: 5
+        num_bits: 1
+        description: "Status of the D6 switch."
+      D5STA:
+        start_bit: 4
+        num_bits: 1
+        description: "Status of the D5 switch."
+      D4STA:
+        start_bit: 3
+        num_bits: 1
+        description: "Status of the D4 switch."
+      D3STA:
+        start_bit: 2
+        num_bits: 1
+        description: "Status of the D3 switch."
+      D2STA:
+        start_bit: 1
+        num_bits: 1
+        description: "Status of the D2 switch."
+      DR0STA:
+        start_bit: 0
+        num_bits: 1
+        description: "Status of the DR0 switch."
+  PSWSTA:
+    address: 0x21B4
+    reset: 0x00000000
+    access: R
+    description: "Switch matrix status (Px/Pxx)"
+    bitfields:
+      PL2STA:
+        start_bit: 14
+        num_bits: 1
+        description: "Status of PL2 Switch."
+      PLSTA:
+        start_bit: 13
+        num_bits: 1
+        description: "PL Switch Control."
+      P13STA:
+        start_bit: 12
+        num_bits: 1
+        description: "Status of the P13 Switch."
+      P11STA:
+        start_bit: 10
+        num_bits: 1
+        description: "Status of the P11 Switch."
+      P9STA:
+        start_bit: 8
+        num_bits: 1
+        description: "Status of the P9 Switch."
+      P8STA:
+        start_bit: 7
+        num_bits: 1
+        description: "Status of the P8 Switch."
+      P7STA:
+        start_bit: 6
+        num_bits: 1
+        description: "Status of the P7 Switch."
+      P6STA:
+        start_bit: 5
+        num_bits: 1
+        description: "Status of the P6 Switch."
+      P5STA:
+        start_bit: 4
+        num_bits: 1
+        description: "Status of the P5 Switch."
+      P4STA:
+        start_bit: 3
+        num_bits: 1
+        description: "Status of the P4 Switch."
+      P3STA:
+        start_bit: 2
+        num_bits: 1
+        description: "Status of the P3 Switch."
+      P2STA:
+        start_bit: 1
+        num_bits: 1
+        description: "Status of the P2 Switch."
+      PR0STA:
+        start_bit: 0
+        num_bits: 1
+        description: "Status of the PR0 Switch"
+  NSWSTA:
+    address: 0x21B8
+    reset: 0x00000000
+    access: R
+    description: "Switch matrix status (Nx/Nxx)"
+    bitfields:
+      NL2STA:
+        start_bit: 11
+        num_bits: 1
+        description: "Status of the NL2 switch."
+      NLSTA:
+        start_bit: 10
+        num_bits: 1
+        description: "Status of the NL switch."
+      NR1STA:
+        start_bit: 9
+        num_bits: 1
+        description: "Status of the NR1 switch."
+      N9STA:
+        start_bit: 8
+        num_bits: 1
+        description: "Status of the N9 switch."
+      N7STA:
+        start_bit: 6
+        num_bits: 1
+        description: "Status of the N7 switch."
+      N6STA:
+        start_bit: 5
+        num_bits: 1
+        description: "Status of the N6 switch."
+      N5STA:
+        start_bit: 4
+        num_bits: 1
+        description: "Status of the N5 switch."
+      N4STA:
+        start_bit: 3
+        num_bits: 1
+        description: "Status of the N4 switch."
+      N3STA:
+        start_bit: 2
+        num_bits: 1
+        description: "Status of the N3 switch."
+      N2STA:
+        start_bit: 1
+        num_bits: 1
+        description: "Status of the N2 switch."
+      N1STA:
+        start_bit: 0
+        num_bits: 1
+        description: "Status of the N1 switch."
+  TSWSTA:
+    address: 0x21BC
+    reset: 0x00000000
+    access: R
+    description: "Switch matrix status (Tx/TR1)"
+    bitfields:
+      TR1STA:
+        start_bit: 11
+        num_bits: 1
+        description: "Status of the TR1 switch."
+      T10STA:
+        start_bit: 9
+        num_bits: 1
+        description: "Status of the T10 switch."
+      T9STA:
+        start_bit: 8
+        num_bits: 1
+        description: "Status of the T9 switch."
+      T7STA:
+        start_bit: 6
+        num_bits: 1
+        description: "Status of the T7 switch."
+      T6STA:
+        start_bit: 5
+        num_bits: 1
+        description: "Status of the T6 switch."
+      T5STA:
+        start_bit: 4
+        num_bits: 1
+        description: "Status of the T5 switch."
+      T4STA:
+        start_bit: 3
+        num_bits: 1
+        description: "Status of the T4 switch."
+      T3STA:
+        start_bit: 2
+        num_bits: 1
+        description: "Status of the T3 switch."
+      T2STA:
+        start_bit: 1
+        num_bits: 1
+        description: "Status of the T2 switch."
+      T1STA:
+        start_bit: 0
+        num_bits: 1
+        description: "Status of the T1 switch."
+PRECISION_VOLTAGE_REFERENCES:
+  BUFSENCON:
+    address: 0x2180
+    reset: 0x00000037
+    access: R/W
+    description: "High power and low power buffer control register"
+    bitfields:
+      V1P8THERMSTEN:
+        start_bit: 8
+        num_bits: 1
+        description: "Buffered reference output. Buffered output to the AIN3/BUF_VREF1V82 pin."
+      V1P1LPADCCHGDIS:
+        start_bit: 6
+        num_bits: 1
+        description: "Controls the decoupling capacitor discharge switch."
+      V1P1LPADCEN:
+        start_bit: 5
+        num_bits: 1
+        description: "ADC 1.11 V low power common-mode buffer (optional)."
+      V1P1HSADCEN:
+        start_bit: 4
+        num_bits: 1
+        description: "Enables the 1.11 V, high speed, common-mode buffer."
+      V1P8HSADCCHGDIS:
+        start_bit: 3
+        num_bits: 1
+        description: "Controls the decoupling capacitor discharge switch."
+      V1P8LPADCEN:
+        start_bit: 2
+        num_bits: 1
+        description: "ADC 1.82 V low power reference buffer."
+      V1P8HSADCILIMITEN:
+        start_bit: 1
+        num_bits: 1
+        description: "High speed ADC input current limit. This bit protects the ADC input buffer."
+      V1P8HSADCEN:
+        start_bit: 0
+        num_bits: 1
+        description: "High power 1.82 V reference buffer."
+SEQUENCER_AND_FIFO:
+  SEQCON:
+    address: 0x2004
+    reset: 0x00000002
+    access: R/W
+    description: "Sequencer configuration register"
+    bitfields:
+      SEQWRTMR:
+        start_bit: 8
+        num_bits: 8
+        description: "Timer for sequencer write commands."
+      SEQHALT:
+        start_bit: 4
+        num_bits: 1
+        description: "Halt sequence debugging feature."
+      SEQHALTFIFOEMPTY:
+        start_bit: 1
+        num_bits: 1
+        description: "Halt sequencer, if empty."
+      SEQEN:
+        start_bit: 0
+        num_bits: 1
+        description: "Enable sequencer."
+  FIFOCON:
+    address: 0x2008
+    reset: 0x00001010
+    access: R/W
+    description: "FIFO configuration register"
+    bitfields:
+      DATAFIFOSRCSEL:
+        start_bit: 13
+        num_bits: 3
+        description: "Selects the source for the data FIFO."
+      DATAFIFOEN:
+        start_bit: 11
+        num_bits: 1
+        description: "Data FIFO enable."
+  SEQCRC:
+    address: 0x2060
+    reset: 0x00000001
+    access: R
+    description: "Sequencer CRC value register"
+    bitfields:
+      CRC:
+        start_bit: 0
+        num_bits: 8
+        description: "Sequencer command CRC value."
+  SEQCNT:
+    address: 0x2064
+    reset: 0x00000000
+    access: R/W
+    description: "Sequencer command count register"
+    bitfields: {}
+  SEQTIMEOUT:
+    address: 0x2068
+    reset: 0x00000000
+    access: R
+    description: "Sequencer timeout counter register"
+    bitfields:
+      Timeout:
+        start_bit: 0
+        num_bits: 30
+        description: "Current value of the sequencer timeout counter."
+  DATAFIFORD:
+    address: 0x206C
+    reset: 0x00000000
+    access: R
+    description: "Data FIFO read register"
+    bitfields:
+      DATAFIFOOUT:
+        start_bit: 0
+        num_bits: 32
+        description: "Data FIFO read."
+  CMDFIFOWRITE:
+    address: 0x2070
+    reset: 0x00000000
+    access: W
+    description: "Command FIFO write register"
+    bitfields:
+      CMDFIFOIN:
+        start_bit: 0
+        num_bits: 32
+        description: "Command FIFO write."
+  SEQSLPLOCK:
+    address: 0x2118
+    reset: 0x00000000
+    access: R/W
+    description: "Sequencer sleep control lock register"
+    bitfields:
+      SEQ_SLP_PW:
+        start_bit: 0
+        num_bits: 20
+        description: "Password for the SEQTRGSLP register."
+  SEQTRGSLP:
+    address: 0x211C
+    reset: 0x00000000
+    access: R/W
+    description: "Sequencer trigger sleep register"
+    bitfields:
+      TRGSLP:
+        start_bit: 0
+        num_bits: 1
+        description: "Trigger sleep by sequencer."
+  SEQ0INFO:
+    address: 0x21CC
+    reset: 0x00000000
+    access: R/W
+    description: "Sequence 0 information register"
+    bitfields:
+      SEQ0INSTNUM:
+        start_bit: 16
+        num_bits: 11
+        description: "SEQ0 instruction number."
+      SEQ0STARTADDR:
+        start_bit: 0
+        num_bits: 11
+        description: "SEQ0 start address."
+  SEQ2INFO:
+    address: 0x21D0
+    reset: 0x00000000
+    access: R/W
+    description: "Sequence 2 information register"
+    bitfields:
+      SEQ2INSTNUM:
+        start_bit: 16
+        num_bits: 11
+        description: "SEQ2 instruction number."
+      SEQ2STARTADDR:
+        start_bit: 0
+        num_bits: 11
+        description: "SEQ2 start address."
+  CMDFIFOWADDR:
+    address: 0x21D4
+    reset: 0x00000000
+    access: R/W
+    description: "Command FIFO write address register"
+    bitfields:
+      WADDR:
+        start_bit: 0
+        num_bits: 11
+        description: "Write address."
+  CMDDATACON:
+    address: 0x21D8
+    reset: 0x00000410
+    access: R/W
+    description: "Command data control register"
+    bitfields:
+      DATAMEMMDE:
+        start_bit: 9
+        num_bits: 3
+        description: "Data FIFO mode select."
+      DATA_MEM_SEL:
+        start_bit: 6
+        num_bits: 3
+        description: "Data FIFO size select."
+      CMDMEMMDE:
+        start_bit: 3
+        num_bits: 3
+        description: "Command FIFO mode."
+      CMD_MEM_SEL:
+        start_bit: 0
+        num_bits: 3
+        description: "Command memory select."
+  DATAFIFOTHRES:
+    address: 0x21E0
+    reset: 0x00000000
+    access: R/W
+    description: "Data FIFO threshold register"
+    bitfields:
+      HIGHTHRES:
+        start_bit: 16
+        num_bits: 11
+        description: "High threshold."
+  SEQ3INFO:
+    address: 0x21E4
+    reset: 0x00000000
+    access: R/W
+    description: "Sequence 3 information register"
+    bitfields:
+      INSTNUM:
+        start_bit: 16
+        num_bits: 11
+        description: "SEQ3 instruction number."
+      STARTADDR:
+        start_bit: 0
+        num_bits: 11
+        description: "SEQ3 start address."
+  SEQ1INFO:
+    address: 0x21E8
+    reset: 0x00000000
+    access: R/W
+    description: "Sequence 1 information register"
+    bitfields:
+      SEQ1INSTNUM:
+        start_bit: 16
+        num_bits: 11
+        description: "SEQ1 instruction number."
+      SEQ1STARTADDR:
+        start_bit: 0
+        num_bits: 11
+        description: "SEQ1 start address."
+  FIFOCNTSTA:
+    address: 0x2200
+    reset: 0x00000000
+    access: R
+    description: "Command and data FIFO internal data count register"
+    bitfields:
+      DATAFIFOCNTSTA:
+        start_bit: 16
+        num_bits: 11
+        description: "Current number of words in the data FIFO"
+  SYNCEXTDEVICE:
+    address: 0x2054
+    reset: 0x00000000
+    access: R/W
+    description: "Sync external devices register"
+    bitfields:
+      Sync:
+        start_bit: 0
+        num_bits: 8
+        description: "Output data of the GPIOx."
+  TRIGSEQ:
+    address: 0x0430
+    reset: 0x0000
+    access: R/W
+    description: "Trigger sequence register"
+    bitfields:
+      TRIG3:
+        start_bit: 3
+        num_bits: 1
+        description: "Trigger Sequence 3."
+      TRIG2:
+        start_bit: 2
+        num_bits: 1
+        description: "Trigger Sequence 2."
+      TRIG1:
+        start_bit: 1
+        num_bits: 1
+        description: "Trigger Sequence 1."
+      TRIG0:
+        start_bit: 0
+        num_bits: 1
+        description: "Trigger Sequence 0."
+WAVEFORM_GENERATOR:
+  WGCON:
+    address: 0x2014
+    reset: 0x00000030
+    access: R/W
+    description: "Waveform generator configuration register."
+    bitfields:
+      DACGAINCAL:
+        start_bit: 5
+        num_bits: 1
+        description: "Bypass DAC gain."
+      DACOFFSETCAL:
+        start_bit: 4
+        num_bits: 1
+        description: "Bypass DAC Offset."
+      TYPESEL:
+        start_bit: 1
+        num_bits: 2
+        description: "These bits select the type of waveform."
+  WGDCLEVEL1:
+    address: 0x2018
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, Trapezoid DC Level 1."
+    bitfields: {}
+  WGDCLEVEL2:
+    address: 0x201C
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, Trapezoid DC Level 2."
+    bitfields: {}
+  WGDELAY1:
+    address: 0x2020
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, Trapezoid Delay 1 time."
+    bitfields: {}
+  WGSLOPE1:
+    address: 0x2024
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, Trapezoid Slope 1 time."
+    bitfields: {}
+  WGDELAY2:
+    address: 0x2028
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, Trapezoid Delay 2 time."
+    bitfields: {}
+  WGSLOPE2:
+    address: 0x202C
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, Trapezoid Slope 2 time."
+    bitfields: {}
+  WGFCW:
+    address: 0x2030
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, sinusoid frequency control word."
+    bitfields: {}
+  WGPHASE:
+    address: 0x2034
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, sinusoid phase offset."
+    bitfields: {}
+  WGOFFSET:
+    address: 0x2038
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, sinusoid offset."
+    bitfields: {}
+  WGAMPLITUDE:
+    address: 0x203C
+    reset: 0x00000000
+    access: R/W
+    description: "Waveform generator register, sinusoid amplitude."
+    bitfields: {}

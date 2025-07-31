@@ -1,5 +1,4 @@
 import adi
-import iio
 
 from .CN0565Tester import CN0565Tester
 from .ExtractLCR import ExtractLCR

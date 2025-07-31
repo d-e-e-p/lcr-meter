@@ -1,19 +1,24 @@
+
+from .RegisterAccess import RegisterAccess
+
+
 class CN0565Tester:
     def __init__(self, dev, dev1, dev2):
         self.dev = dev
         self.dev1 = dev1
         self.dev2 = dev2
+        self.register_access = RegisterAccess(dev)
         self.init_dev()
 
     def init_dev(self):
         dev = self.dev
         dev.gpio1_toggle = True
         dev.magnitude_mode = False
-        """In impedance mode, device measures voltage and current and to compute the impedance.
-        Otherwise, only the voltage is measured."""
+        # In impedance mode, device measures voltage and current and to compute the impedance.
         dev.impedance_mode = True
         dev.immediate = True
         dev.electrode_count = 16
+        self.dump_state()
         self.set_rtia()
 
 
@@ -45,11 +50,14 @@ class CN0565Tester:
 
         return ret
 
+    def dump_state(self):
+        self.register_access.read_register("AFECON")
+
     def set_rtia(self):
         # RTIA = open    -> bits [3:0] = 1111
         # RTIA = 200 ohm -> bits [3:0] = 0000
-		# Diode OFF -> bit [4] = 0
-	    # CTIA = 4pF -> bits [12:5] = 0b0010 -> shifted left by 5 = 0b0010 << 5 = 0x40
+        # Diode OFF -> bit [4] = 0
+        # CTIA = 4pF -> bits [12:5] = 0b0010 -> shifted left by 5 = 0b0010 << 5 = 0x40
 
         rtia_bits = 0b0000             # RTIA = 200 ohm (bits [3:0])
         # rtia_bits = 0b1111             # RTIA = open (bits [3:0])
