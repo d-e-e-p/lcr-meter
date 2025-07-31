@@ -24,7 +24,7 @@ def main():  # pragma: no cover
 
     tester = CN0565Tester(dev0, dev1, dev2)
     amp_list = [100, 200, 500]
-    freq_list = [1000, 2000, 5000, 10000, 20000]
+    freq_list = [1000, 2000, 5000, 10000, ]
     amp_list = [100, ]
     seq_list = range(12)
     # seq_list = [6]
@@ -40,8 +40,10 @@ def main():  # pragma: no cover
     print(" comparison: ")
     calibrate = Calibrate(seq_list, amp_list)
     res_comp = calibrate.compare(res_lcr)
-    for amp, Rsq, formula, _ in res_comp:
-        print(f"{amp=} {Rsq=} {formula}")
+    for amp, Rsq, formula, _ in res_comp['R']:
+        print(f"R {amp=} {Rsq=} {formula}")
+    for amp, Rsq, formula, _ in res_comp['L']:
+        print(f"L {amp=} {Rsq=} {formula}")
 
 if __name__ == "__main__":  # pragma: no cover
     main()

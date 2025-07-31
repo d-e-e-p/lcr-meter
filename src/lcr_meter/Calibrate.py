@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -5,20 +6,21 @@ class Calibrate:
     def __init__(self, seq_list, amp_list):
         self.seq_list = seq_list
         self.amp_list = amp_list
+        # R L C
         self.expected_rlc_table = """
-        0           0           0
-        1           1           1
-        10          1          10
-        22          2          22
-        47          4          47
-        68          6          68
-        100         10         100
-        150         10         150
-        220         20         220
-        330         30         330
-        470         40         470
-        1000        100        1000
-"""
+             0      1      0  
+             1      2.7    0  
+            10      10     0  
+            22      20     0  
+            47      40     0  
+            68       4      0  
+            100      0      0  
+            150     23     0  
+            220     0.44     0  
+            330     .2     0  
+            470     12     0  
+            1000    30    0  
+        """
         # Parse the table and create a mapping from sequence target to expected [R, L, C]
         expected_rlc = self.parse_rlc_table(self.expected_rlc_table)
         self.expected_map = {seq: rlc for seq, rlc in zip(self.seq_list, expected_rlc)}
@@ -41,10 +43,15 @@ class Calibrate:
         for seq, amp, measured_l, measured_c, measured_r in res_lcr:
             if amp in self.amp_list and seq in self.expected_map:
                 expected_r, expected_l, expected_c = self.expected_map[seq]
-                
-                comp_r[amp].append([expected_r, measured_r])
-                comp_l[amp].append([expected_l, measured_l])
-                comp_c[amp].append([expected_c, measured_c])
+               
+                if measured_r is not None and math.isfinite(measured_r):
+                    comp_r[amp].append([expected_r, measured_r])
+
+                if measured_l is not None and math.isfinite(measured_l):
+                    comp_l[amp].append([expected_l, measured_l])
+
+                if measured_c is not None and math.isfinite(measured_c):
+                    comp_c[amp].append([expected_c, measured_c])
 
         return {'R': comp_r, 'L': comp_l, 'C': comp_c}
 
