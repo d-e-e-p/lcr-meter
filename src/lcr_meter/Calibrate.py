@@ -5,87 +5,71 @@ class Calibrate:
     def __init__(self, seq_list, amp_list):
         self.seq_list = seq_list
         self.amp_list = amp_list
-        self.expected_r = [float(r) for r in """
-         0
-         1
-         10
-         22
-         47
-         68
-         100
-         150
-         220
-         330
-         470
-         1000
-        """.split()]
+        self.expected_rlc_table = """
+        0           0           0
+        1           1           1
+        10          1          10
+        22          2          22
+        47          4          47
+        68          6          68
+        100         10         100
+        150         10         150
+        220         20         220
+        330         30         330
+        470         40         470
+        1000        100        1000
+"""
+        # Parse the table and create a mapping from sequence target to expected [R, L, C]
+        expected_rlc = self.parse_rlc_table(self.expected_rlc_table)
+        self.expected_map = {seq: rlc for seq, rlc in zip(self.seq_list, expected_rlc)}
 
-        self.expected_l = [float(l) for l in """
-         0
-         1
-         10
-         22
-         47
-         68
-         100
-         150
-         220
-         330
-         470
-         1000
-        """.split()]
+    def parse_rlc_table(self, table_str):
+        triplets = []
+        for line in table_str.strip().splitlines():
+            if line.strip():  # skip empty lines
+                parts = line.split()
+                triplets.append([float(p) for p in parts])
+        return triplets
 
-        self.expected_c = [float(c) for c in """
-         0
-         1
-         10
-         22
-         47
-         68
-         100
-         150
-         220
-         330
-         470
-         1000
-        """.split()]
+    def create_compare_tables(self, res_lcr):
+        # Initialize comparison tables for R, L, and C
+        comp_r = {amp: [] for amp in self.amp_list}
+        comp_l = {amp: [] for amp in self.amp_list}
+        comp_c = {amp: [] for amp in self.amp_list}
 
-    def create_compare_table(self, res_lcr):
-        # res in format [seq_target, amp_target, L, C, R]
-        comp = {amp: [] for amp in self.amp_list}
-        for seq, amp, L, C, R in res_lcr:
-            if amp in comp:
-                expected_r = self.expected_r[seq]
-                measured_r = R
-                comp[amp].append([expected_r, measured_r])
+        # res_lcr in format [seq_target, amp_target, L, C, R]
+        for seq, amp, measured_l, measured_c, measured_r in res_lcr:
+            if amp in self.amp_list and seq in self.expected_map:
+                expected_r, expected_l, expected_c = self.expected_map[seq]
+                
+                comp_r[amp].append([expected_r, measured_r])
+                comp_l[amp].append([expected_l, measured_l])
+                comp_c[amp].append([expected_c, measured_c])
 
-        return comp
+        return {'R': comp_r, 'L': comp_l, 'C': comp_c}
 
-    def compare(self, res_lcr):
-        res = []
-        comp = self.create_compare_table(res_lcr)
-
+    def _fit_and_print_component(self, component_name, comp_table):
+        print(f"\n--- Calibration for {component_name} ---")
+        
         def linear_func(x, a, b):
             return a * x + b
 
-        for amp, table in comp.items():
+        fit_results = []
+        for amp, table in comp_table.items():
             if not table or len(table) < 2:
-                # Cannot fit with less than 2 points
                 continue
 
-            # create regression table to map measured_r to expected_r
-            expected_r_vals = np.array([item[0] for item in table])
-            measured_r_vals = np.array([item[1] for item in table])
+            expected_vals = np.array([item[0] for item in table])
+            measured_vals = np.array([item[1] for item in table])
 
             # We want to map from measured (x) to expected (y)
-            x_data = measured_r_vals
-            y_data = expected_r_vals
+            x_data = measured_vals
+            y_data = expected_vals
 
             try:
                 popt, pcov = curve_fit(linear_func, x_data, y_data)
                 slope, intercept = popt
 
-                # Calculate R-squared value
                 residuals = y_data - linear_func(x_data, *popt)
                 ss_res = np.sum(residuals**2)
                 ss_tot = np.sum((y_data - np.mean(y_data))**2)
@@ -95,19 +79,36 @@ class Calibrate:
                     r_squared = 1 - (ss_res / ss_tot)
 
                 formula = f"y = {slope:.4f}x + {intercept:.4f}"
-                print(f"{amp=}")
-                print(f"{'Expected':>10} {'Measured':>10} {'Extrapolated':>15}")
-                print("-" * 38)
+                print(f"\nAmplitude: {amp}")
+                print(f"Fit Formula: {formula}, R-squared: {r_squared:.4f}")
+                print(f"{'Expected':>12} {'Measured':>12} {'Extrapolated':>15}")
+                print("-" * 41)
 
-                # Print each row
-                for expected, measured in zip(expected_r_vals, measured_r_vals):
+                for expected, measured in zip(expected_vals, measured_vals):
                     extrapolated = linear_func(measured, *popt)
-                    print(f"{expected:10.0f} {measured:10.0f} {extrapolated:10.0f}")
-
-
-                res.append([amp, r_squared, formula, popt])
+                    print(f"{expected:12.2f} {measured:12.2f} {extrapolated:15.2f}")
+                
+                fit_results.append([amp, r_squared, formula, popt])
             except RuntimeError:
                 print(f"Warning: Could not perform curve fit for amplitude {amp}.")
-                res.append([amp, 0.0, "fit failed", []])
+                fit_results.append([amp, 0.0, "fit failed", []])
+        
+        return fit_results
 
-        return res
+    def compare(self, res_lcr):
+        all_results = {}
+        comp_tables = self.create_compare_tables(res_lcr)
+
+        # Perform fit for Resistance
+        res_r = self._fit_and_print_component("Resistance (R)", comp_tables['R'])
+        all_results['R'] = res_r
+
+        # Perform fit for Inductance
+        res_l = self._fit_and_print_component("Inductance (L)", comp_tables['L'])
+        all_results['L'] = res_l
+
+        # Perform fit for Capacitance
+        res_c = self._fit_and_print_component("Capacitance (C)", comp_tables['C'])
+        all_results['C'] = res_c
+        
+        return all_results
