@@ -20,6 +20,36 @@ class Calibrate:
          1000
         """.split()]
 
+        self.expected_l = [float(l) for l in """
+         0
+         1
+         10
+         22
+         47
+         68
+         100
+         150
+         220
+         330
+         470
+         1000
+        """.split()]
+
+        self.expected_c = [float(c) for c in """
+         0
+         1
+         10
+         22
+         47
+         68
+         100
+         150
+         220
+         330
+         470
+         1000
+        """.split()]
+
     def create_compare_table(self, res_lcr):
         # res in format [seq_target, amp_target, L, C, R]
         comp = {amp: [] for amp in self.amp_list}

@@ -7,7 +7,7 @@ class CN0565Tester:
         self.dev = dev
         self.dev1 = dev1
         self.dev2 = dev2
-        self.register_access = RegisterAccess(dev)
+        self.register_access = RegisterAccess(dev1)
         self.init_dev()
 
     def init_dev(self):

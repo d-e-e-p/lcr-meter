@@ -1,6 +1,7 @@
-# ad5940.py
+# 
+import os
 
-from RegisterMap import RegisterMap
+from .RegisterMap import RegisterMap
 
 
 class RegisterAccess:
@@ -10,7 +11,8 @@ class RegisterAccess:
         # Initialize a dictionary to act as the register memory
         self.dev = dev
         # Load the register map from the YAML file
-        self.ad5940_map = RegisterMap.from_yaml_file("ad5940_registers.yaml")
+        yaml_file = os.path.join(os.path.dirname(__file__),  'ad5940_registers.yaml')
+        self.ad5940_map = RegisterMap.from_yaml_file(yaml_file)
 
     def read_register(self, register_name):
         """
@@ -28,7 +30,7 @@ class RegisterAccess:
         reset_val = reg_info.get("reset", 0)  # Get the reset value for the register
         bitfields_info = reg_info["bitfields"]
 
-        reg_val = self.dev.read_reg(address)
+        reg_val = self.dev.reg_read(address)
 
         print(f"\nDecoding Register: {register_name} (Address: 0x{address:04X})")
         print(f"Current Value: 0x{reg_val:08X} (Reset: 0x{reset_val:08X})")
@@ -92,7 +94,7 @@ class RegisterAccess:
         num_bits = bitfield_info["num_bits"]
 
         # 1. Read the current register value
-        current_reg_val = self.dev.read_reg(address)
+        current_reg_val = self.dev.reg_read(address)
         print(f"Read current value of {register_name}: 0x{current_reg_val:08X}")
 
         # 2. Modify the value
