@@ -6,18 +6,18 @@ class Calibrate:
         self.seq_list = seq_list
         self.amp_list = amp_list
         self.expected_r = [float(r) for r in """
-            470
-            1000
-            2000
-            20000
-            10
-            120
-            1
-            7500
-            47
-            68
-            100
-            220
+         0
+         1
+         10
+         22
+         47
+         68
+         100
+         150
+         220
+         330
+         470
+         1000
         """.split()]
 
     def create_compare_table(self, res_lcr):
@@ -65,6 +65,15 @@ class Calibrate:
                     r_squared = 1 - (ss_res / ss_tot)
 
                 formula = f"y = {slope:.4f}x + {intercept:.4f}"
+                print(f"{amp=}")
+                print(f"{'Expected':>10} {'Measured':>10} {'Extrapolated':>15}")
+                print("-" * 38)
+
+                # Print each row
+                for expected, measured in zip(expected_r_vals, measured_r_vals):
+                    extrapolated = linear_func(measured, *popt)
+                    print(f"{expected:10.0f} {measured:10.0f} {extrapolated:10.0f}")
+
 
                 res.append([amp, r_squared, formula, popt])
             except RuntimeError:

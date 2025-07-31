@@ -40,8 +40,8 @@ def main():  # pragma: no cover
     print(" comparison: ")
     calibrate = Calibrate(seq_list, amp_list)
     res_comp = calibrate.compare(res_lcr)
-    for amp, Rsq, _, _ in res_comp:
-        print(f"{amp=} {Rsq=}")
+    for amp, Rsq, formula, _ in res_comp:
+        print(f"{amp=} {Rsq=} {formula}")
 
 if __name__ == "__main__":  # pragma: no cover
     main()
