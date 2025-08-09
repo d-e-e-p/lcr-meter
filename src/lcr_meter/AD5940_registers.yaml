@@ -421,6 +421,121 @@ HIGH_SPEED_DAC:
         start_bit: 0
         num_bits: 12
         description: "DAC code, written directly to the DAC. The minimum code is 0x200 and the maximum code is 0xE00. Midscale (0x800) corresponds to an output voltage of 0 V."
+  CALDATLOCK:
+    address: 0x2230
+    reset: 0xDE87A5A0
+    access: R/W
+    description: Calibration Data Lock Register
+    bitfields:
+      Key:
+        start_bit: 0
+        num_bits: 32
+        description: >
+          Password for the calibration data registers. This password prevents the overwriting of data after the calibration phase.
+          Write this value to unlock the calibration registers.
+        value_map:
+          0xDE87A5AF: Unlocks calibration registers
+          0xDE87A5A0: "reset value"
+  DACGAIN:
+    address: 0x2260
+    reset: 0x00000800
+    access: R/W
+    description: >
+      DAC Gain Register.
+      Protected by CALDATLOCK. Valid for all settings of HSDACCON, Bit 12 and Bit 0.
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 12
+        description: High speed DAC gain correction factor. Unsigned number.
+        value_map:
+          0x000: Maximum negative gain adjustment occurs.
+          0x800: No gain adjustment.
+          0xFFF: Maximum positive gain adjustment occurs.
+
+  DACOFFSETATTEN:
+    address: 0x2264
+    reset: 0x00000000
+    access: R/W
+    description: >
+      DAC Offset with Attenuator Enabled (Low Power Mode).
+      LSB ≈ 4.9 µV or 24.7 µV depending on HSDACCON[12,0].
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 12
+        description: >
+          DAC offset correction factor. This value is a signed number in two's complement format with 0.5 LSB precision.
+          Used when the attenuator is enabled.
+        value_map:
+          0x800: "-210. Maximum negative adjustment that results in negative full scale/2 adjustment."
+          0xFFF: "-0.5. Results in a −0.5 LSB adjustment."
+          0x000: "0. No offset adjustment."
+          0x001: "0.5. Results in a 0.5 LSB adjustment."
+          0x7FF: "210 − 0.5. Maximum positive adjustment that results in a positive full scale/2 − 0.5 LSB adjustment."
+
+  DACOFFSET:
+    address: 0x2268
+    reset: 0x00000000
+    access: R/W
+    description: >
+      DAC Offset with Attenuator Disabled (Low Power Mode).
+      LSB ≈ 197.7 µV or 39.5 µV depending on HSDACCON[12,0].
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 12
+        description: >
+          DAC offset correction factor. This value is a signed number in two's complement format with 0.5 LSB precision.
+          Used when the attenuator is disabled.
+        value_map:
+          0x800: "-210. Maximum negative adjustment that results in negative full scale/2 adjustment."
+          0xFFF: "-0.5. Results in a −0.5 LSB adjustment."
+          0x000: "0. No offset adjustment."
+          0x001: "0.5. Results in a 0.5 LSB adjustment."
+          0x7FF: "210 − 0.5. Maximum positive adjustment that results in a positive full scale/2 − 0.5 LSB adjustment."
+
+  DACOFFSETATTENHS:
+    address: 0x22B8
+    reset: 0x00000000
+    access: R/W
+    description: >
+      DAC Offset with Attenuator Enabled (High Speed Mode).
+      Protected by CALDATLOCK. LSB ≈ 4.9 µV or 24.7 µV depending on HSDACCON[12,0].
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 12
+        description: >
+          DAC offset correction factor. This value is a signed number in two's complement format with 0.5 LSB precision.
+          Used when the attenuator is enabled.
+        value_map:
+          0x800: "-210. Maximum negative adjustment that results in negative full scale/2 adjustment."
+          0xFFF: "-0.5. Results in a −0.5 LSB adjustment."
+          0x000: "0. No offset adjustment."
+          0x001: "0.5. Results in a 0.5 LSB adjustment."
+          0x7FF: "210 − 0.5. Maximum positive adjustment that results in a positive full scale/2 − 0.5 LSB adjustment."
+
+  DACOFFSETHS:
+    address: 0x22BC
+    reset: 0x00000000
+    access: R/W
+    description: >
+      DAC Offset with Attenuator Disabled (High Speed Mode).
+      Protected by CALDATLOCK. LSB ≈ 197.7 µV or 39.5 µV depending on HSDACCON[12,0].
+    bitfields:
+      Value:
+        start_bit: 0
+        num_bits: 12
+        description: >
+          DAC offset correction factor. This value is a signed number in two's complement format with 0.5 LSB precision.
+          Used when the attenuator is disabled.
+        value_map:
+          0x800: "-210. Maximum negative adjustment that results in negative full scale/2 adjustment."
+          0xFFF: "-0.5. Results in a −0.5 LSB adjustment."
+          0x000: "0. No offset adjustment."
+          0x001: "0.5. Results in a 0.5 LSB adjustment."
+          0x7FF: "210 − 0.5. Maximum positive adjustment that results in a positive full scale/2 − 0.5 LSB adjustment."
 HIGH_SPEED_TIA:
   HSRTIACON:
     address: 0x20F0
@@ -432,14 +547,37 @@ HIGH_SPEED_TIA:
         start_bit: 5
         num_bits: 8
         description: "Configure capacitor in parallel with RTIA. This capacitor stabilizes the amplifier loop."
+        value_map:
+          0b000001: "1 pF"
+          0b000010: "2 pF"
+          0b000100: "4 pF"
+          0b001000: "8 pF"
+          0b010000: "16 pF"
+          0b100000: "32 pF"
       TIASW6CON:
         start_bit: 4
         num_bits: 1
         description: "SW6 switch control. Use the SW6 switch to select whether or not to use the diode in parallel with RTIA."
+        value_map:
+          0: "Diode OFF (SW6 open)"
+          1: "Diode ON (SW6 closed)"
       RTIACON:
         start_bit: 0
         num_bits: 4
         description: "Configure general RTIA value."
+        value_map:
+          0x0: "200 Ω"
+          0x1: "1 kΩ,"
+          0x2: "5 kΩ,"
+          0x3: "10 kΩ,"
+          0x4: "20 kΩ,"
+          0x5: "40 kΩ,"
+          0x6: "80 kΩ,"
+          0x7: "160 kΩ,"
+          0x8: "RTIA is open"
+          0x9: "RTIA is open"
+          0xF: "RTIA is open"
+
   DE0RESCON:
     address: 0x20F8
     reset: 0x000000FF
@@ -450,6 +588,58 @@ HIGH_SPEED_TIA:
         start_bit: 0
         num_bits: 8
         description: "RLOAD_DE0 and RTIA_DE0 setting."
+        value_map:
+          0xFF: "RLOAD_DE0 =Disconnected  RTIA_DE0 =Disconnected"
+          0x00: "RLOAD_DE0 =0  RTIA_DE0 =50 Ω"
+          0x18: "RLOAD_DE0 =0  RTIA_DE0 =100 Ω"
+          0x38: "RLOAD_DE0 =0  RTIA_DE0 =200 Ω"
+          0x58: "RLOAD_DE0 =0  RTIA_DE0 =1.1 kΩ"
+          0x60: "RLOAD_DE0 =0  RTIA_DE0 =5.1 kΩ"
+          0x68: "RLOAD_DE0 =0  RTIA_DE0 =10.1 kΩ"
+          0x70: "RLOAD_DE0 =0  RTIA_DE0 =20.1 kΩ"
+          0x78: "RLOAD_DE0 =0  RTIA_DE0 =40.1 kΩ"
+          0x80: "RLOAD_DE0 =0  RTIA_DE0 =80.1 kΩ"
+          0x88: "RLOAD_DE0 =0  RTIA_DE0 =160.1 kΩ"
+          0x9: "RLOAD_DE0 =10  RTIA_DE0 =50 Ω"
+          0x21: "RLOAD_DE0 =10  RTIA_DE0 =100 Ω"
+          0x39: "RLOAD_DE0 =10  RTIA_DE0 =190 Ω"
+          0x59: "RLOAD_DE0 =10  RTIA_DE0 =1.09 kΩ"
+          0x61: "RLOAD_DE0 =10  RTIA_DE0 =5.09 kΩ"
+          0x69: "RLOAD_DE0 =10  RTIA_DE0 =10.09 kΩ"
+          0x71: "RLOAD_DE0 =10  RTIA_DE0 =20.09 kΩ"
+          0x79: "RLOAD_DE0 =10  RTIA_DE0 =40.09 kΩ"
+          0x81: "RLOAD_DE0 =10  RTIA_DE0 =80.09 kΩ"
+          0x89: "RLOAD_DE0 =10  RTIA_DE0 =160.09 kΩ"
+          0x12: "RLOAD_DE0 =30  RTIA_DE0 =50 Ω"
+          0x2A: "RLOAD_DE0 =30  RTIA_DE0 =100 Ω"
+          0x4A: "RLOAD_DE0 =30  RTIA_DE0 =210 Ω"
+          0x5A: "RLOAD_DE0 =30  RTIA_DE0 =1.07 kΩ"
+          0x62: "RLOAD_DE0 =30  RTIA_DE0 =5.07 kΩ"
+          0x6A: "RLOAD_DE0 =30  RTIA_DE0 =10.07 kΩ"
+          0x72: "RLOAD_DE0 =30  RTIA_DE0 =20.07 kΩ"
+          0x7A: "RLOAD_DE0 =30  RTIA_DE0 =40.07 kΩ"
+          0x82: "RLOAD_DE0 =30  RTIA_DE0 =80.07 kΩ"
+          0x8A: "RLOAD_DE0 =30  RTIA_DE0 =160.07 kΩ"
+          0x1B: "RLOAD_DE0 =50  RTIA_DE0 =50 Ω"
+          0x33: "RLOAD_DE0 =50  RTIA_DE0 =100 Ω"
+          0x4B: "RLOAD_DE0 =50  RTIA_DE0 =190 Ω"
+          0x5B: "RLOAD_DE0 =50  RTIA_DE0 =1.05 kΩ"
+          0x63: "RLOAD_DE0 =50  RTIA_DE0 =5.05 kΩ"
+          0x6B: "RLOAD_DE0 =50  RTIA_DE0 =10.05 kΩ"
+          0x73: "RLOAD_DE0 =50  RTIA_DE0 =20.05 kΩ"
+          0x7B: "RLOAD_DE0 =50  RTIA_DE0 =40.05 kΩ"
+          0x83: "RLOAD_DE0 =50  RTIA_DE0 =80.05 kΩ"
+          0x8B: "RLOAD_DE0 =50  RTIA_DE0 =160.05 kΩ"
+          0x34: "RLOAD_DE0 =100  RTIA_DE0 =50 Ω"
+          0x3C: "RLOAD_DE0 =100  RTIA_DE0 =100 Ω"
+          0x54: "RLOAD_DE0 =100  RTIA_DE0 =200 Ω"
+          0x5C: "RLOAD_DE0 =100  RTIA_DE0 =1 kΩ"
+          0x64: "RLOAD_DE0 =100  RTIA_DE0 =5 kΩ"
+          0x6C: "RLOAD_DE0 =100  RTIA_DE0 =10 kΩ"
+          0x74: "RLOAD_DE0 =100  RTIA_DE0 =20 kΩ"
+          0x7C: "RLOAD_DE0 =100  RTIA_DE0 =40 kΩ"
+          0x84: "RLOAD_DE0 =100  RTIA_DE0 =80 kΩ"
+          0x8C: "RLOAD_DE0 =100  RTIA_DE0 =160 kΩ"
   HSTIACON:
     address: 0x20FC
     reset: 0x00000000
@@ -644,16 +834,6 @@ ADC_CIRCUIT:
         num_bits: 4
         description: "Set these bits to 1 to disable chop. Set these bits to 0 to enable chop."
 ADC_CALIBRATION:
-  CALDATLOCK:
-    address: 0x2230
-    reset: 0xDE87A5A0
-    access: R/W
-    description: "Calibration data lock register"
-    bitfields:
-      Key:
-        start_bit: 0
-        num_bits: 32
-        description: "Password for the calibration data registers."
   ADCOFFSETLPTIA:
     address: 0x2288
     reset: 0x00000000

@@ -7,7 +7,7 @@ class CN0565Tester:
         self.dev = dev
         self.dev1 = dev1
         self.dev2 = dev2
-        self.register_access = RegisterAccess(dev1)
+        self.reg = RegisterAccess(dev1)
         self.init_dev()
 
     def init_dev(self):
@@ -50,63 +50,58 @@ class CN0565Tester:
 
         return ret
 
+    def set_state(self):
+        self.reg.write_register("CALDATLOCK", 'Value', 0xDE87A5AF)  # unlock
+        self.reg.write_register("DACGAIN", 'Value', 0x800)          # no gain
+
+        self.reg.write_register("HSRTIACON", 'CTIACON', 0b000001)   # 1pF
+        self.reg.write_register("HSRTIACON", 'TIASW6CON', 0b0)      # Diode OFF
+
+        # disable high speed DAC
+        self.reg.write_register("AFECON", 'DACEN', 0b0)
+        self.reg.write_register("AFECON", 'ADCCONVEN', 0b1)
+        self.reg.write_register("AFECON", 'ADCEN', 0b1)
+        # enable low speed TIA
+        self.reg.write_register("LPDACCON0", 'PWDEN', 0b0)
+        # Enable Writes to Low Power DAC Data Register
+        self.reg.write_register("LPDACCON0", 'RSTEN', 0b1)
+        # Set Low Power DAC Output Voltages
+        self.reg.write_register("LPDACDAT0", 'DACIN6', 0x3F)
+        self.reg.write_register("LPDACDAT0", 'DACIN12', 0xFFF)
+        # Enable the DC DAC Buffer
+        # external RTIA
+        self.reg.write_register("LPTIACON0", 'TIAGAIN', 0b0)
+        # low-pass filter resistor (RLPF)
+        self.reg.write_register("LPTIACON0", 'TIARF', 0b111)
+        # Power Up the Low Power TIA
+        self.reg.write_register("LPTIACON0", 'TIAPDEN', 0b0)
+
+
+
+
+
+        
+
+        """
+        To use the DE0 pin for the external RTIA value, set the following register values:
+            ► DE0RESCON = 0x97.
+            ► HSRTIACON, Bits[3:0] = 0xF.
+        """
+        rtia_external = True
+        if rtia_external:
+            self.reg.write_register("DE0RESCON", 'DE0RCON', 0x97)       #
+            self.reg.write_register("HSRTIACON", 'RTIACON', 0xF)        # disconnect rtia
+        else:
+            self.reg.write_register("HSRTIACON", 'RTIACON', 0x0)        # 200 Ω
+
+
+        # self.reg.write_register("HSRTIACON", 'RTIACON', 0xF)      # open
+
+
+
+
     def dump_state(self):
-        self.register_access.read_register("AFECON")
+        print("RTIA: ")
+        self.reg.read_register("HSRTIACON")
 
-    def set_rtia(self):
-        # RTIA = open    -> bits [3:0] = 1111
-        # RTIA = 200 ohm -> bits [3:0] = 0000
-        # Diode OFF -> bit [4] = 0
-        # CTIA = 4pF -> bits [12:5] = 0b0010 -> shifted left by 5 = 0b0010 << 5 = 0x40
 
-        rtia_bits = 0b0000             # RTIA = 200 ohm (bits [3:0])
-        # rtia_bits = 0b1111             # RTIA = open (bits [3:0])
-        diode_bit = 0 << 4             # Diode OFF (bit 4 = 0)
-        ctia_bits = 0b0010 << 5        # CTIA = 4 pF (bits [12:5] = 0x40)
-
-        hsrtiacon_value = ctia_bits | diode_bit | rtia_bits
-        # print(f"HSRTIACON = 0x{hsrtiacon_value:08X}")
-        self.dev1.reg_write(0x20F0, hsrtiacon_value)
-        self.dev1.reg_write(0x20F8, 0x97) # disconnect internal rtia
-        self.dev1.reg_write(0x20F8, 0xFF) # reset
-        self.dev1.reg_write(0x20F8, 0x00) # default
-        reg_val = self.dev1.reg_read(0x20F0)
-        # self.decode_hsrtia_config(reg_val)
-
-    def decode_hsrtia_config(self, reg_val):
-        print(f"Raw HSRTIACON Register: 0x{reg_val:08X}")
-
-        # Bits [3:0] ? RTIACON
-        rtia_bits = reg_val & 0xF
-        rtia_map = {
-            0x0: "200 ",
-            0x1: "1 k",
-            0x2: "5 k",
-            0x3: "10 k",
-            0x4: "20 k",
-            0x5: "40 k",
-            0x6: "80 k",
-            0x7: "160 k",
-        }
-        rtia_desc = rtia_map.get(rtia_bits, "RTIA is open")
-
-        # Bit [4] ? TIASW6CON (diode control)
-        sw6_bit = (reg_val >> 4) & 0x1
-        sw6_desc = "Diode ON (SW6 closed)" if sw6_bit else "Diode OFF (SW6 open)"
-
-        # Bits [12:5] ? CTIACON
-        ctiacon_bits = (reg_val >> 5) & 0xFF  # 8 bits
-        ctia_map = {
-            0b00000001: "1 pF",
-            0b00000010: "2 pF",
-            0b00000100: "4 pF",
-            0b00001000: "8 pF",
-            0b00010000: "16 pF",
-            0b00100000: "32 pF",
-        }
-        ctia_desc = ctia_map.get(ctiacon_bits, "Unknown/unused setting")
-
-        # Output
-        print(f"    RTIA Configuration     : {rtia_desc} (bits 3:0 = {rtia_bits:04b})")
-        # print(f"    SW6 Diode Parallel     : {sw6_desc} (bit 4 = {sw6_bit})")
-        # print(f"    CTIA Capacitance       : {ctia_desc} (bits 12:5 = {ctiacon_bits:08b})")
